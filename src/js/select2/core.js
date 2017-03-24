@@ -77,8 +77,12 @@ define([
     });
 
     // Hide the original select
-    $element.addClass('select2-hidden-accessible');
-    $element.attr('aria-hidden', 'true');
+    $element.addClass('select2-hidden-accessible').attr('aria-hidden', 'true');
+
+    // Find label for vanilla select element and set its for attribute to its id
+    var $elementId = $element.attr('id');
+    $element.attr('id', '');
+    $('label#' + $elementId).attr('for', '').attr('id', $elementId);
 
     // Synchronize any monitored attributes
     this._syncAttributes();
@@ -283,11 +287,13 @@ define([
     });
 
     this.on('enable', function () {
-      self.$container.removeClass('select2-container--disabled');
+      self.$container.removeClass('select2-container--disabled')
+        .attr('aria-disabled', 'false');
     });
 
     this.on('disable', function () {
-      self.$container.addClass('select2-container--disabled');
+      self.$container.addClass('select2-container--disabled')
+        .attr('aria-disabled', 'true');
     });
 
     this.on('blur', function () {
@@ -505,7 +511,7 @@ define([
 
     var disabled = !args[0];
 
-    this.$element.prop('disabled', disabled);
+    this.$element.prop('disabled', disabled).attr('aria-disabled', 'true');
   };
 
   Select2.prototype.data = function () {
@@ -597,7 +603,8 @@ define([
       '</span>'
     );
 
-    $container.attr('dir', this.options.get('dir'));
+    $container.attr('dir', this.options.get('dir'))
+      .attr('aria-labelledby', $elementId);
 
     this.$container = $container;
 
