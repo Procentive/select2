@@ -80,9 +80,13 @@ define([
     $element.addClass('select2-hidden-accessible').attr('aria-hidden', 'true');
 
     // Find label for vanilla select element and set its for attribute to its id
-    var $elementId = $element.attr('id');
-    $element.attr('id', '');
-    $('label#' + $elementId).attr('for', '').attr('id', $elementId);
+    this.$elementId = this.$element.attr('id');
+    this.$element.attr('id', '');
+
+    if ($("[for='" + this.$elementId + "']").length) {
+      $("[for='" + this.$elementId + "']").removeAttr('for').attr('id', this.$elementId);
+      this.hasLabelElement = true;
+    }
 
     // Synchronize any monitored attributes
     this._syncAttributes();
@@ -603,8 +607,13 @@ define([
       '</span>'
     );
 
-    $container.attr('dir', this.options.get('dir'))
-      .attr('aria-labelledby', $elementId);
+    $container.attr('dir', this.options.get('dir'));
+
+    if (this.$elementId && this.hasLabelElement) {
+      $container.attr('aria-labelledby', this.$elementId);
+    } else {
+      $container.attr('aria-label', this.$elementId)
+    }
 
     this.$container = $container;
 
