@@ -791,7 +791,7 @@ S2.define('select2/results',[
 
   Results.prototype.render = function () {
     var $results = $(
-      '<ul class="select2-results__options" role="tree"></ul>'
+      '<ul class="select2-results__options" role="listbox"></ul>'
     );
 
     if (this.options.get('multiple')) {
@@ -814,7 +814,7 @@ S2.define('select2/results',[
     this.hideLoading();
 
     var $message = $(
-      '<li role="treeitem" aria-live="assertive"' +
+      '<li role="option" aria-live="assertive"' +
       ' class="select2-results__option"></li>'
     );
 
@@ -948,7 +948,7 @@ S2.define('select2/results',[
     option.className = 'select2-results__option';
 
     var attrs = {
-      'role': 'treeitem',
+      'role': 'option',
       'aria-selected': 'false'
     };
 
@@ -1397,7 +1397,7 @@ S2.define('select2/selection/base',[
     container.on('open', function () {
       // When the dropdown is open, aria-expanded="true"
       self.$selection.attr('aria-expanded', 'true');
-      self.$selection.attr('aria-owns', resultsId);
+      self.$selection.attr('aria-controls', resultsId);
 
       self._attachCloseHandler(container);
     });
@@ -1406,7 +1406,7 @@ S2.define('select2/selection/base',[
       // When the dropdown is closed, aria-expanded="false"
       self.$selection.attr('aria-expanded', 'false');
       self.$selection.removeAttr('aria-activedescendant');
-      self.$selection.removeAttr('aria-owns');
+      self.$selection.removeAttr('aria-controls');
 
       self.$selection.focus();
 
@@ -4119,7 +4119,7 @@ S2.define('select2/dropdown/infiniteScroll',[
     var $option = $(
       '<li ' +
       'class="select2-results__option select2-results__option--load-more"' +
-      'role="treeitem" aria-disabled="true"></li>'
+      'role="option" aria-disabled="true"></li>'
     );
 
     var message = this.options.get('translations').get('loadingMore');
@@ -5129,9 +5129,13 @@ S2.define('select2/core',[
     $element.addClass('select2-hidden-accessible').attr('aria-hidden', 'true');
 
     // Find label for vanilla select element and set its for attribute to its id
-    var $elementId = $element.attr('id');
-    $element.attr('id', '');
-    $('label#' + $elementId).attr('for', '').attr('id', $elementId);
+    this.$elementId = this.$element.attr('id');
+    this.$element.attr('id', '');
+
+    if ($("[for='" + this.$elementId + "']").length) {
+      $("[for='" + this.$elementId + "']").removeAttr('for').attr('id', this.$elementId);
+      this.hasLabelElement = true;
+    }
 
     // Synchronize any monitored attributes
     this._syncAttributes();
@@ -5652,8 +5656,13 @@ S2.define('select2/core',[
       '</span>'
     );
 
-    $container.attr('dir', this.options.get('dir'))
-      .attr('aria-labelledby', $elementId);
+    $container.attr('dir', this.options.get('dir'));
+
+    if (this.$elementId && this.hasLabelElement) {
+      $container.attr('aria-labelledby', this.$elementId);
+    } else {
+      $container.attr('aria-label', this.$elementId)
+    }
 
     this.$container = $container;
 
