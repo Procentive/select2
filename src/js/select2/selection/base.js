@@ -70,7 +70,7 @@ define([
     container.on('open', function () {
       // When the dropdown is open, aria-expanded="true"
       self.$selection.attr('aria-expanded', 'true');
-      self.$selection.attr('aria-controls', resultsId);
+      self.$selection.attr('aria-owns', resultsId);
 
       self._attachCloseHandler(container);
     });
@@ -79,7 +79,7 @@ define([
       // When the dropdown is closed, aria-expanded="false"
       self.$selection.attr('aria-expanded', 'false');
       self.$selection.removeAttr('aria-activedescendant');
-      self.$selection.removeAttr('aria-controls');
+      self.$selection.removeAttr('aria-owns');
 
       self.$selection.focus();
 
