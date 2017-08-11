@@ -83,8 +83,9 @@ define([
     this.$elementId = this.$element.attr('id');
     this.$element.attr('id', '');
 
-    if ($("[for='" + this.$elementId + "']").length) {
-      $("[for='" + this.$elementId + "']").removeAttr('for').attr('id', this.$elementId);
+    var $label = $('[for="' + this.$elementId + '"]');
+    if ($label.length) {
+      $label.removeAttr('for').attr('id', this.$elementId);
       this.hasLabelElement = true;
     }
 
@@ -612,7 +613,7 @@ define([
     if (this.$elementId && this.hasLabelElement) {
       $container.attr('aria-labelledby', this.$elementId);
     } else {
-      $container.attr('aria-label', this.$elementId)
+      $container.attr('aria-label', this.$elementId);
     }
 
     this.$container = $container;
