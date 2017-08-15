@@ -4255,7 +4255,21 @@ S2.define('select2/dropdown/attachBody',[
   };
 
   AttachBody.prototype._positionDropdown = function () {
-    var $window = $(window);
+    var found = false;
+    var $clippingAncestor = $('.select2-results').parents().filter(function(e) {
+      if(found) {
+        return false;
+      }
+      else {
+        found = $(this).css('overflow-y') != 'visible';
+        return found;
+      }
+    });
+
+    if($clippingAncestor.length == 0)
+      {
+      $clippingAncestor = $('body');
+      }
 
     var isCurrentlyAbove = this.$dropdown.hasClass('select2-dropdown--above');
     var isCurrentlyBelow = this.$dropdown.hasClass('select2-dropdown--below');
@@ -4277,13 +4291,13 @@ S2.define('select2/dropdown/attachBody',[
       height: this.$dropdown.outerHeight(false)
     };
 
-    var viewport = {
-      top: $window.scrollTop(),
-      bottom: $window.scrollTop() + $window.height()
+    var space = {
+      top: $clippingAncestor.scrollTop(),
+      bottom: $clippingAncestor.scrollTop() + $clippingAncestor.height()
     };
 
-    var enoughRoomAbove = viewport.top < (offset.top - dropdown.height);
-    var enoughRoomBelow = viewport.bottom > (offset.bottom + dropdown.height);
+    var enoughRoomAbove = space.top < (offset.top - dropdown.height);
+    var enoughRoomBelow = space.bottom > (offset.bottom + dropdown.height);
 
     var css = {
       left: offset.left,
@@ -5132,8 +5146,9 @@ S2.define('select2/core',[
     this.$elementId = this.$element.attr('id');
     this.$element.attr('id', '');
 
-    if ($("[for='" + this.$elementId + "']").length) {
-      $("[for='" + this.$elementId + "']").removeAttr('for').attr('id', this.$elementId);
+    var $label = $('[for="' + this.$elementId + '"]');
+    if ($label.length) {
+      $label.removeAttr('for').attr('id', this.$elementId);
       this.hasLabelElement = true;
     }
 
@@ -5661,7 +5676,7 @@ S2.define('select2/core',[
     if (this.$elementId && this.hasLabelElement) {
       $container.attr('aria-labelledby', this.$elementId);
     } else {
-      $container.attr('aria-label', this.$elementId)
+      $container.attr('aria-label', this.$elementId);
     }
 
     this.$container = $container;
