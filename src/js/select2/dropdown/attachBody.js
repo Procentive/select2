@@ -159,11 +159,18 @@ define([
     };
 
     var clippingOffset = $clippingAncestor.offset();
-    clippingOffset.bottom = clippingOffset.top + $clippingAncestor.height();
 
-    var enoughRoomAbove = clippingOffset.top <
+    // Available space is space within both
+    //  the viewport and the clipping container.
+    var availableSpace = {
+      top: Math.max(clippingOffset.top, 0),
+      bottom: Math.min(
+        clippingOffset.top + $clippingAncestor.height(), window.innerHeight)
+    };
+
+    var enoughRoomAbove = availableSpace.top <
       (containerOffset.top - dropdown.height);
-    var enoughRoomBelow = clippingOffset.bottom >
+    var enoughRoomBelow = availableSpace.bottom >
       (containerOffset.bottom + dropdown.height);
 
     // Determine what the parent element is to use for calciulating the offset
