@@ -127,7 +127,8 @@ define([
         return false;
       }
       else {
-        found = $(this).css('overflow-y') != 'visible';
+        found = $(this).css('overflow-y') != 'visible' &&
+          $(this).css('position') != 'static';
         return found;
       }
     });
