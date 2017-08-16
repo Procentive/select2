@@ -4255,40 +4255,50 @@ S2.define('select2/dropdown/attachBody',[
   };
 
   AttachBody.prototype._positionDropdown = function () {
-    var $window = $(window);
+    var found = false;
+    var $clippingAncestor = $('.select2-results').parents().filter(function(e) {
+      if(found) {
+        return false;
+      }
+      else {
+        found = $(this).css('overflow-y') != 'visible';
+        return found;
+      }
+    });
+
+    if($clippingAncestor.length == 0)
+      {
+      $clippingAncestor = $('body');
+      }
 
     var isCurrentlyAbove = this.$dropdown.hasClass('select2-dropdown--above');
     var isCurrentlyBelow = this.$dropdown.hasClass('select2-dropdown--below');
 
     var newDirection = null;
 
-    var offset = this.$container.offset();
+    var containerOffset = this.$container.offset();
+    containerOffset.bottom =
+      containerOffset.top + this.$container.outerHeight(false);
 
-    offset.bottom = offset.top + this.$container.outerHeight(false);
-
-    var container = {
+    var containerDimensions = {
       height: this.$container.outerHeight(false)
     };
 
-    container.top = offset.top;
-    container.bottom = offset.top + container.height;
+    containerDimensions.top = containerOffset.top;
+    containerDimensions.bottom =
+      containerOffset.top + containerDimensions.height;
 
     var dropdown = {
       height: this.$dropdown.outerHeight(false)
     };
 
-    var viewport = {
-      top: $window.scrollTop(),
-      bottom: $window.scrollTop() + $window.height()
-    };
+    var clippingOffset = $clippingAncestor.offset();
+    clippingOffset.bottom = clippingOffset.top + $clippingAncestor.height();
 
-    var enoughRoomAbove = viewport.top < (offset.top - dropdown.height);
-    var enoughRoomBelow = viewport.bottom > (offset.bottom + dropdown.height);
-
-    var css = {
-      left: offset.left,
-      top: container.bottom
-    };
+    var enoughRoomAbove = clippingOffset.top <
+      (containerOffset.top - dropdown.height);
+    var enoughRoomBelow = clippingOffset.bottom >
+      (containerOffset.bottom + dropdown.height);
 
     // Determine what the parent element is to use for calciulating the offset
     var $offsetParent = this.$dropdownParent;
@@ -4301,8 +4311,10 @@ S2.define('select2/dropdown/attachBody',[
 
     var parentOffset = $offsetParent.offset();
 
-    css.top -= parentOffset.top;
-    css.left -= parentOffset.left;
+    var css = {
+      left: containerOffset.left - parentOffset.left,
+      top: containerDimensions.bottom - parentOffset.top
+    };
 
     if (!isCurrentlyAbove && !isCurrentlyBelow) {
       newDirection = 'below';
@@ -4316,7 +4328,7 @@ S2.define('select2/dropdown/attachBody',[
 
     if (newDirection == 'above' ||
       (isCurrentlyAbove && newDirection !== 'below')) {
-      css.top = container.top - parentOffset.top - dropdown.height;
+      css.top = containerDimensions.top - parentOffset.top - dropdown.height;
     }
 
     if (newDirection != null) {
@@ -5132,8 +5144,9 @@ S2.define('select2/core',[
     this.$elementId = this.$element.attr('id');
     this.$element.attr('id', '');
 
-    if ($("[for='" + this.$elementId + "']").length) {
-      $("[for='" + this.$elementId + "']").removeAttr('for').attr('id', this.$elementId);
+    var $label = $('[for="' + this.$elementId + '"]');
+    if ($label.length) {
+      $label.removeAttr('for').attr('id', this.$elementId);
       this.hasLabelElement = true;
     }
 
@@ -5661,7 +5674,7 @@ S2.define('select2/core',[
     if (this.$elementId && this.hasLabelElement) {
       $container.attr('aria-labelledby', this.$elementId);
     } else {
-      $container.attr('aria-label', this.$elementId)
+      $container.attr('aria-label', this.$elementId);
     }
 
     this.$container = $container;
