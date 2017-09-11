@@ -336,10 +336,14 @@ define([
         } else if (key === KEYS.UP) {
           self.trigger('results:previous', {});
 
+          // Prevent window from scrolling up
+          evt.stopPropagation();
           evt.preventDefault();
         } else if (key === KEYS.DOWN) {
           self.trigger('results:next', {});
 
+          // Prevent window from scrolling down
+          evt.stopPropagation();
           evt.preventDefault();
         }
       } else {
