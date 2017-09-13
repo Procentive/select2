@@ -38,7 +38,7 @@ define([
 
     var $message = $(
       '<li role="option" aria-live="assertive"' +
-      ' class="select2-results__option"></li>'
+      ' class="select2-results__option" tabindex="-1"></li>'
     );
 
     var message = this.options.get('translations').get(params.message);
@@ -172,7 +172,9 @@ define([
 
     var attrs = {
       'role': 'option',
-      'aria-selected': 'false'
+      'aria-selected': 'false',
+      'tabindex': '-1',
+      'id': 'select2Opt_' + (data.id || data._resultId)
     };
 
     if (data.disabled) {
@@ -289,8 +291,6 @@ define([
     });
 
     container.on('open', function () {
-      // When the dropdown is open, aria-expended="true"
-      self.$results.attr('aria-expanded', 'true');
       self.$results.attr('aria-hidden', 'false');
 
       self.setClasses();
@@ -298,8 +298,6 @@ define([
     });
 
     container.on('close', function () {
-      // When the dropdown is closed, aria-expended="false"
-      self.$results.attr('aria-expanded', 'false');
       self.$results.attr('aria-hidden', 'true');
       self.$results.removeAttr('aria-activedescendant');
     });
@@ -460,6 +458,10 @@ define([
 
       self.getHighlightedResults()
           .removeClass('select2-results__option--highlighted');
+
+      if (self.data && self.data.container && self.data.container.$selection) {
+        self.data.container.$selection.attr("aria-activedescendant", data.id);
+      }
 
       self.trigger('results:focus', {
         data: data,

@@ -815,7 +815,7 @@ S2.define('select2/results',[
 
     var $message = $(
       '<li role="option" aria-live="assertive"' +
-      ' class="select2-results__option"></li>'
+      ' class="select2-results__option" tabindex="-1"></li>'
     );
 
     var message = this.options.get('translations').get(params.message);
@@ -949,7 +949,9 @@ S2.define('select2/results',[
 
     var attrs = {
       'role': 'option',
-      'aria-selected': 'false'
+      'aria-selected': 'false',
+      'tabindex': '-1',
+      'id': 'select2Opt_' + (data.id || data._resultId)
     };
 
     if (data.disabled) {
@@ -1066,8 +1068,6 @@ S2.define('select2/results',[
     });
 
     container.on('open', function () {
-      // When the dropdown is open, aria-expended="true"
-      self.$results.attr('aria-expanded', 'true');
       self.$results.attr('aria-hidden', 'false');
 
       self.setClasses();
@@ -1075,8 +1075,6 @@ S2.define('select2/results',[
     });
 
     container.on('close', function () {
-      // When the dropdown is closed, aria-expended="false"
-      self.$results.attr('aria-expanded', 'false');
       self.$results.attr('aria-hidden', 'true');
       self.$results.removeAttr('aria-activedescendant');
     });
@@ -1238,6 +1236,10 @@ S2.define('select2/results',[
       self.getHighlightedResults()
           .removeClass('select2-results__option--highlighted');
 
+      if (self.data && self.data.container && self.data.container.$selection) {
+        self.data.container.$selection.attr("aria-activedescendant", data.id);
+      }
+
       self.trigger('results:focus', {
         data: data,
         element: $(this)
@@ -1341,9 +1343,9 @@ S2.define('select2/selection/base',[
 
   BaseSelection.prototype.render = function () {
     var $selection = $(
-      '<span class="select2-selection" role="combobox" ' +
-      ' aria-haspopup="true" aria-expanded="false">' +
-      '</span>'
+      '<button class="select2-selection" role="combobox" ' +
+      ' aria-haspopup="listbox" aria-expanded="false" aria-autocomplete="list">' +
+      '</button>'
     );
 
     this._tabindex = 0;
@@ -1355,6 +1357,7 @@ S2.define('select2/selection/base',[
     }
 
     $selection.attr('title', this.$element.attr('title'));
+    $selection.attr('aria-label', this.$element.attr('aria-label'));
     $selection.attr('tabindex', this._tabindex);
 
     this.$selection = $selection;
@@ -1397,7 +1400,7 @@ S2.define('select2/selection/base',[
     container.on('open', function () {
       // When the dropdown is open, aria-expanded="true"
       self.$selection.attr('aria-expanded', 'true');
-      self.$selection.attr('aria-owns', resultsId);
+      self.$selection.attr('aria-controls', resultsId);
 
       self._attachCloseHandler(container);
     });
@@ -1406,7 +1409,7 @@ S2.define('select2/selection/base',[
       // When the dropdown is closed, aria-expanded="false"
       self.$selection.attr('aria-expanded', 'false');
       self.$selection.removeAttr('aria-activedescendant');
-      self.$selection.removeAttr('aria-owns');
+      self.$selection.removeAttr('aria-controls');
 
       self.$selection.focus();
 

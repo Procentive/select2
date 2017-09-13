@@ -14,9 +14,9 @@ define([
 
   BaseSelection.prototype.render = function () {
     var $selection = $(
-      '<span class="select2-selection" role="combobox" ' +
-      ' aria-haspopup="true" aria-expanded="false">' +
-      '</span>'
+      '<button class="select2-selection" role="combobox" ' +
+      ' aria-haspopup="listbox" aria-expanded="false" aria-autocomplete="list">' +
+      '</button>'
     );
 
     this._tabindex = 0;
@@ -28,6 +28,7 @@ define([
     }
 
     $selection.attr('title', this.$element.attr('title'));
+    $selection.attr('aria-label', this.$element.attr('aria-label'));
     $selection.attr('tabindex', this._tabindex);
 
     this.$selection = $selection;
@@ -70,7 +71,7 @@ define([
     container.on('open', function () {
       // When the dropdown is open, aria-expanded="true"
       self.$selection.attr('aria-expanded', 'true');
-      self.$selection.attr('aria-owns', resultsId);
+      self.$selection.attr('aria-controls', resultsId);
 
       self._attachCloseHandler(container);
     });
@@ -79,7 +80,7 @@ define([
       // When the dropdown is closed, aria-expanded="false"
       self.$selection.attr('aria-expanded', 'false');
       self.$selection.removeAttr('aria-activedescendant');
-      self.$selection.removeAttr('aria-owns');
+      self.$selection.removeAttr('aria-controls');
 
       self.$selection.focus();
 
