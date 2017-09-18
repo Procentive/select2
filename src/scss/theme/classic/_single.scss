@@ -22,6 +22,10 @@
     float: right;
     font-weight: bold;
     margin-right: 10px;
+    background: none;
+    -webkit-appearance: none;
+    border: none;
+    line-height: 1;
   }
 
   .select2-selection__placeholder {

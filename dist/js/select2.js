@@ -1819,7 +1819,7 @@ S2.define('select2/selection/allowClear',[
       return;
     }
 
-    if (evt.which == KEYS.DELETE || evt.which == KEYS.BACKSPACE) {
+    if (evt.which == KEYS.DELETE || evt.which == KEYS.BACKSPACE || (evt.which == KEYS.ENTER && $(evt.target).hasClass('.select2-selection__clear'))) {
       this._handleClear(evt);
     }
   };
@@ -1833,9 +1833,9 @@ S2.define('select2/selection/allowClear',[
     }
 
     var $remove = $(
-      '<span class="select2-selection__clear">' +
+      '<button class="select2-selection__clear">' +
         '&times;' +
-      '</span>'
+      '</button>'
     );
     $remove.data('data', data);
 
@@ -3913,7 +3913,7 @@ S2.define('select2/dropdown/search',[
       '<span class="select2-search select2-search--dropdown">' +
         '<input class="select2-search__field" type="search" tabindex="-1"' +
         ' autocomplete="off" autocorrect="off" autocapitalize="off"' +
-        ' spellcheck="false" role="textbox" />' +
+        ' spellcheck="false" role="textbox" aria-autocomplete="list" />' +
       '</span>'
     );
 
@@ -3976,8 +3976,36 @@ S2.define('select2/dropdown/search',[
 
         if (showSearch) {
           self.$searchContainer.removeClass('select2-search--hide');
+
+          // If search will show, we need to treat $selection like a dropdown
+          var selection = self.$container.find(".select2-selection");
+
+          // These attributes will be removed from selection and added to search
+          var attributesToTransfer = [
+            "role",
+            "aria-autocomplete",
+            "aria-haspopup",
+            "aria-activedescendant",
+            "aria-controls"
+          ];
+
+          for (var i = 0; i < attributesToTransfer.length; i++) {
+            var tmpAttr = selection.attr(attributesToTransfer[i]);
+            selection.removeAttr(attributesToTransfer[i]);
+
+            if (attributesToTransfer[i] === "aria-controls") {
+              self.$searchContainer.find("input").attr("aria-owns", tmpAttr);
+            } else {
+              self.$searchContainer.find("input").attr(attributesToTransfer[i], tmpAttr);
+            }
+          }
+
+          // Next, let's make selection act like a dropdown
+
+
         } else {
-          self.$searchContainer.addClass('select2-search--hide');
+          // Remove search from DOM if it shouldn't show
+          self.$searchContainer.remove();
         }
       }
     });

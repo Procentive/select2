@@ -21,6 +21,10 @@
 
   .select2-selection__clear {
     position: relative;
+    background: none;
+    -webkit-appearance: none;
+    border: none;
+    line-height: 1;
   }
 }
 
