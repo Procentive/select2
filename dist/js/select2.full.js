@@ -1236,8 +1236,13 @@ S2.define('select2/results',[
       self.getHighlightedResults()
           .removeClass('select2-results__option--highlighted');
 
+      // Active descendant goes to search input if it's on the DOM
       if (self.data && self.data.container && self.data.container.$selection) {
-        self.data.container.$selection.attr("aria-activedescendant", data.id);
+        if (self.data.container.$dropdown && self.data.container.$dropdown.find(".select2-search__field").length) {
+            self.data.container.$dropdown.find(".select2-search__field").attr("aria-activedescendant", data.id);
+        } else {
+            self.data.container.$selection.attr("aria-activedescendant", data.id);
+        }
       }
 
       self.trigger('results:focus', {
@@ -1390,7 +1395,11 @@ S2.define('select2/selection/base',[
     });
 
     container.on('results:focus', function (params) {
-      self.$selection.attr('aria-activedescendant', params.data._resultId);
+        if (self.container && self.container.$dropdown && self.container.$dropdown.find(".select2-search__field").length) {
+            self.container.$dropdown.attr('aria-activedescendant', params.data._resultId);
+        } else {
+            self.$selection.attr('aria-activedescendant', params.data._resultId);
+        }
     });
 
     container.on('selection:update', function (params) {
@@ -3991,18 +4000,17 @@ S2.define('select2/dropdown/search',[
 
           for (var i = 0; i < attributesToTransfer.length; i++) {
             var tmpAttr = selection.attr(attributesToTransfer[i]);
-            selection.removeAttr(attributesToTransfer[i]);
 
             if (attributesToTransfer[i] === "aria-controls") {
+              var newAriaControls = tmpAttr.split('-results')[0] + "-resultDropdown";
               self.$searchContainer.find("input").attr("aria-owns", tmpAttr);
+              selection.attr("aria-controls", newAriaControls);
+              self.$dropdown.attr({ role: 'region', 'id': newAriaControls });
             } else {
+              selection.removeAttr(attributesToTransfer[i]);
               self.$searchContainer.find("input").attr(attributesToTransfer[i], tmpAttr);
             }
           }
-
-          // Next, let's make selection act like a dropdown
-
-
         } else {
           // Remove search from DOM if it shouldn't show
           self.$searchContainer.remove();

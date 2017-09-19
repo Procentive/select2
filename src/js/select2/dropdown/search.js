@@ -89,18 +89,17 @@ define([
 
           for (var i = 0; i < attributesToTransfer.length; i++) {
             var tmpAttr = selection.attr(attributesToTransfer[i]);
-            selection.removeAttr(attributesToTransfer[i]);
 
             if (attributesToTransfer[i] === "aria-controls") {
+              var newAriaControls = tmpAttr.split('-results')[0] + "-resultDropdown";
               self.$searchContainer.find("input").attr("aria-owns", tmpAttr);
+              selection.attr("aria-controls", newAriaControls);
+              self.$dropdown.attr({ role: 'region', 'id': newAriaControls });
             } else {
+              selection.removeAttr(attributesToTransfer[i]);
               self.$searchContainer.find("input").attr(attributesToTransfer[i], tmpAttr);
             }
           }
-
-          // Next, let's make selection act like a dropdown
-
-
         } else {
           // Remove search from DOM if it shouldn't show
           self.$searchContainer.remove();

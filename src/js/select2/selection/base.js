@@ -61,7 +61,11 @@ define([
     });
 
     container.on('results:focus', function (params) {
-      self.$selection.attr('aria-activedescendant', params.data._resultId);
+        if (self.container && self.container.$dropdown && self.container.$dropdown.find(".select2-search__field").length) {
+            self.container.$dropdown.attr('aria-activedescendant', params.data._resultId);
+        } else {
+            self.$selection.attr('aria-activedescendant', params.data._resultId);
+        }
     });
 
     container.on('selection:update', function (params) {

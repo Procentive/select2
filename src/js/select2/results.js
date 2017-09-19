@@ -459,8 +459,13 @@ define([
       self.getHighlightedResults()
           .removeClass('select2-results__option--highlighted');
 
+      // Active descendant goes to search input if it's on the DOM
       if (self.data && self.data.container && self.data.container.$selection) {
-        self.data.container.$selection.attr("aria-activedescendant", data.id);
+        if (self.data.container.$dropdown && self.data.container.$dropdown.find(".select2-search__field").length) {
+            self.data.container.$dropdown.find(".select2-search__field").attr("aria-activedescendant", data.id);
+        } else {
+            self.data.container.$selection.attr("aria-activedescendant", data.id);
+        }
       }
 
       self.trigger('results:focus', {
