@@ -1803,6 +1803,9 @@ S2.define('select2/selection/allowClear',[
 
     var data = $clear.data('data');
 
+    var previousVal = this.$element.val();
+    this.$element.val(this.placeholder.id);
+
     for (var d = 0; d < data.length; d++) {
       var unselectData = {
         data: data[d]
@@ -1814,11 +1817,12 @@ S2.define('select2/selection/allowClear',[
 
       // If the event was prevented, don't clear it out.
       if (unselectData.prevented) {
+        this.$element.val(previousVal);
         return;
       }
     }
 
-    this.$element.val(this.placeholder.id).trigger('change');
+    this.$element.trigger('change');
 
     this.trigger('toggle', {});
   };
@@ -4001,6 +4005,8 @@ S2.define('select2/dropdown/search',[
 
           for (var i = 0; i < attributesToTransfer.length; i++) {
             var tmpAttr = selection.attr(attributesToTransfer[i]);
+            if(!tmpAttr)
+              continue;
 
             if (attributesToTransfer[i] === 'aria-controls') {
               var newAriaControls = tmpAttr.split('-results')[0] + '-resultDropdown';
@@ -5206,9 +5212,9 @@ S2.define('select2/core',[
   Select2.prototype._generateId = function ($element) {
     var id = '';
 
-    if ($element.attr('id') != null) {
+    if ($element.attr('id')) {
       id = $element.attr('id');
-    } else if ($element.attr('name') != null) {
+    } else if ($element.attr('name')) {
       id = $element.attr('name') + '-' + Utils.generateChars(2);
     } else {
       id = Utils.generateChars(4);
@@ -5698,6 +5704,11 @@ S2.define('select2/core',[
     this.$element.removeClass('select2-hidden-accessible');
     this.$element.attr('aria-hidden', 'false');
     this.$element.removeData('select2');
+    // replace the id that was removed in initialization
+    if(this.$elementId)
+      {
+      this.$element.attr('id', this.$elementId);
+      }
 
     this.dataAdapter.destroy();
     this.selection.destroy();
