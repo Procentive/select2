@@ -17,8 +17,9 @@ define([
       '<ul class="select2-results__options" role="listbox"></ul>'
     );
 
-    if(this.options.options.multiple)
+    if(this.options.options.multiple) {
       $results.attr('aria-multiselectable', 'true');
+    }
 
     this.$results = $results;
 
@@ -460,10 +461,10 @@ define([
 
       // Active descendant goes to search input if it's on the DOM
       if (self.data && self.data.container && self.data.container.$selection) {
-        if (self.data.container.$dropdown && self.data.container.$dropdown.find(".select2-search__field").length) {
-            self.data.container.$dropdown.find(".select2-search__field").attr("aria-activedescendant", data.id);
+        if (self.data.container.$dropdown && self.data.container.$dropdown.find('.select2-search__field').length) {
+            self.data.container.$dropdown.find('.select2-search__field').attr('aria-activedescendant', data.id);
         } else {
-            self.data.container.$selection.attr("aria-activedescendant", data.id);
+            self.data.container.$selection.attr('aria-activedescendant', data.id);
         }
       }
 

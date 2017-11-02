@@ -61,7 +61,7 @@ define([
     });
 
     container.on('results:focus', function (params) {
-        if (self.container && self.container.$dropdown && self.container.$dropdown.find(".select2-search__field").length) {
+        if (self.container && self.container.$dropdown && self.container.$dropdown.find('.select2-search__field').length) {
             self.container.$dropdown.attr('aria-activedescendant', params.data._resultId);
         } else {
             self.$selection.attr('aria-activedescendant', params.data._resultId);
