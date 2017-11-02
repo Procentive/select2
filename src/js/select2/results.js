@@ -17,6 +17,9 @@ define([
       '<ul class="select2-results__options" role="listbox"></ul>'
     );
 
+    if(this.options.options.multiple)
+      $results.attr('aria-multiselectable', 'true');
+
     this.$results = $results;
 
     return $results;

@@ -24,8 +24,6 @@ define([
   MultipleSelection.prototype.bind = function (container, $container) {
     var self = this;
 
-    container.$results.attr('aria-multiselectable', 'true');
-
     MultipleSelection.__super__.bind.apply(this, arguments);
 
     this.$selection.on('click', function (evt) {

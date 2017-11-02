@@ -794,6 +794,9 @@ S2.define('select2/results',[
       '<ul class="select2-results__options" role="listbox"></ul>'
     );
 
+    if(this.options.options.multiple)
+      $results.attr('aria-multiselectable', 'true');
+
     this.$results = $results;
 
     return $results;
@@ -1617,8 +1620,6 @@ S2.define('select2/selection/multiple',[
 
   MultipleSelection.prototype.bind = function (container, $container) {
     var self = this;
-
-    container.$results.attr('aria-multiselectable', 'true');
 
     MultipleSelection.__super__.bind.apply(this, arguments);
 
