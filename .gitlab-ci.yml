@@ -1,0 +1,10 @@
+variables:
+  DOCKER_DRIVER: overlay
+
+# normal build job:
+build:
+  except:
+    - master
+  image: node:9.0.0
+  script:
+    - npm run build
