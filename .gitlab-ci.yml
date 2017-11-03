@@ -1,6 +1,13 @@
 variables:
   DOCKER_DRIVER: overlay
 
+cache:
+  # cache per branch:
+  key: "$CI_COMMIT_REF_NAME"
+  paths:
+    - node_modules
+    - bower_components
+
 # normal build job:
 build:
   except:
