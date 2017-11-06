@@ -14,4 +14,21 @@ build:
     - master
   image: node:9.0.0
   script:
+    # Temporary test:
+    - if [ ! -z $(git status -s) ]
+      then
+        echo 'This build changed a file. Please ensure you configure your environment to use only Unix-style line endings, 
+        and remember to commit changes to the dist directory.'
+        echo 'git status says'
+        git status
+        exit 1
+      fi
     - npm run build
+    - if [ ! -z $(git status -s) ]
+      then
+        echo 'This build changed a file. Please ensure you configure your environment to use only Unix-style line endings, 
+        and remember to commit changes to the dist directory.'
+        echo 'git status says'
+        git status
+        exit 1
+      fi
