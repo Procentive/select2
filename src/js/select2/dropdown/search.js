@@ -76,28 +76,28 @@ define([
           self.$searchContainer.removeClass('select2-search--hide');
 
           // If search will show, we need to treat $selection like a dropdown
-          var selection = self.$container.find(".select2-selection");
+          var selection = self.$container.find('.select2-selection');
 
           // These attributes will be removed from selection and added to search
           var attributesToTransfer = [
-            "role",
-            "aria-autocomplete",
-            "aria-haspopup",
-            "aria-activedescendant",
-            "aria-controls"
+            'role',
+            'aria-autocomplete',
+            'aria-haspopup',
+            'aria-activedescendant',
+            'aria-controls'
           ];
 
           for (var i = 0; i < attributesToTransfer.length; i++) {
             var tmpAttr = selection.attr(attributesToTransfer[i]);
 
-            if (attributesToTransfer[i] === "aria-controls") {
-              var newAriaControls = tmpAttr.split('-results')[0] + "-resultDropdown";
-              self.$searchContainer.find("input").attr("aria-owns", tmpAttr);
-              selection.attr("aria-controls", newAriaControls);
+            if (attributesToTransfer[i] === 'aria-controls') {
+              var newAriaControls = tmpAttr.split('-results')[0] + '-resultDropdown';
+              self.$searchContainer.find('input').attr('aria-owns', tmpAttr);
+              selection.attr('aria-controls', newAriaControls);
               self.$dropdown.attr({ role: 'region', 'id': newAriaControls });
             } else {
               selection.removeAttr(attributesToTransfer[i]);
-              self.$searchContainer.find("input").attr(attributesToTransfer[i], tmpAttr);
+              self.$searchContainer.find('input').attr(attributesToTransfer[i], tmpAttr);
             }
           }
         } else {

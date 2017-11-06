@@ -1,0 +1,17 @@
+variables:
+  DOCKER_DRIVER: overlay
+
+cache:
+  # cache per branch:
+  key: "$CI_COMMIT_REF_NAME"
+  paths:
+    - node_modules
+    - bower_components
+
+# normal build job:
+build:
+  except:
+    - master
+  image: node:9.0.0
+  script:
+    - npm run build

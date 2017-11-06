@@ -794,6 +794,10 @@ S2.define('select2/results',[
       '<ul class="select2-results__options" role="listbox"></ul>'
     );
 
+    if(this.options.options.multiple) {
+      $results.attr('aria-multiselectable', 'true');
+    }
+
     this.$results = $results;
 
     return $results;
@@ -1234,10 +1238,10 @@ S2.define('select2/results',[
 
       // Active descendant goes to search input if it's on the DOM
       if (self.data && self.data.container && self.data.container.$selection) {
-        if (self.data.container.$dropdown && self.data.container.$dropdown.find(".select2-search__field").length) {
-            self.data.container.$dropdown.find(".select2-search__field").attr("aria-activedescendant", data.id);
+        if (self.data.container.$dropdown && self.data.container.$dropdown.find('.select2-search__field').length) {
+            self.data.container.$dropdown.find('.select2-search__field').attr('aria-activedescendant', data.id);
         } else {
-            self.data.container.$selection.attr("aria-activedescendant", data.id);
+            self.data.container.$selection.attr('aria-activedescendant', data.id);
         }
       }
 
@@ -1391,7 +1395,7 @@ S2.define('select2/selection/base',[
     });
 
     container.on('results:focus', function (params) {
-        if (self.container && self.container.$dropdown && self.container.$dropdown.find(".select2-search__field").length) {
+        if (self.container && self.container.$dropdown && self.container.$dropdown.find('.select2-search__field').length) {
             self.container.$dropdown.attr('aria-activedescendant', params.data._resultId);
         } else {
             self.$selection.attr('aria-activedescendant', params.data._resultId);
@@ -1617,8 +1621,6 @@ S2.define('select2/selection/multiple',[
 
   MultipleSelection.prototype.bind = function (container, $container) {
     var self = this;
-
-    container.$results.attr('aria-multiselectable', 'true');
 
     MultipleSelection.__super__.bind.apply(this, arguments);
 
@@ -3987,28 +3989,28 @@ S2.define('select2/dropdown/search',[
           self.$searchContainer.removeClass('select2-search--hide');
 
           // If search will show, we need to treat $selection like a dropdown
-          var selection = self.$container.find(".select2-selection");
+          var selection = self.$container.find('.select2-selection');
 
           // These attributes will be removed from selection and added to search
           var attributesToTransfer = [
-            "role",
-            "aria-autocomplete",
-            "aria-haspopup",
-            "aria-activedescendant",
-            "aria-controls"
+            'role',
+            'aria-autocomplete',
+            'aria-haspopup',
+            'aria-activedescendant',
+            'aria-controls'
           ];
 
           for (var i = 0; i < attributesToTransfer.length; i++) {
             var tmpAttr = selection.attr(attributesToTransfer[i]);
 
-            if (attributesToTransfer[i] === "aria-controls") {
-              var newAriaControls = tmpAttr.split('-results')[0] + "-resultDropdown";
-              self.$searchContainer.find("input").attr("aria-owns", tmpAttr);
-              selection.attr("aria-controls", newAriaControls);
+            if (attributesToTransfer[i] === 'aria-controls') {
+              var newAriaControls = tmpAttr.split('-results')[0] + '-resultDropdown';
+              self.$searchContainer.find('input').attr('aria-owns', tmpAttr);
+              selection.attr('aria-controls', newAriaControls);
               self.$dropdown.attr({ role: 'region', 'id': newAriaControls });
             } else {
               selection.removeAttr(attributesToTransfer[i]);
-              self.$searchContainer.find("input").attr(attributesToTransfer[i], tmpAttr);
+              self.$searchContainer.find('input').attr(attributesToTransfer[i], tmpAttr);
             }
           }
         } else {
