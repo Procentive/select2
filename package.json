@@ -68,6 +68,6 @@
     "clean": "rm -rf dist",
     "compile": "npm install && grunt compile",
     "build": "npm run clean && npm run compile && grunt test && grunt minify",
-    "hostDocs" : "npm run compile && grunt docs"
+    "hostDocs": "npm run compile && grunt docs"
   }
 }
