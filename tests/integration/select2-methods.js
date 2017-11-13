@@ -1,4 +1,10 @@
-module('select2(data)');
+/*jshint browser: true */
+
+module('select2(api)', {
+  afterEach: function() {
+    $('body > .select2-container').remove();
+  }
+});
 
 var $ = require('jquery');
 var Select2 = require('select2/core');
@@ -137,3 +143,104 @@ test('multiple value matches the jquery value', function (assert) {
     'The values should match the jquery values'
   );
 });
+
+test('open focuses search input', function (assert) {
+  var done = assert.async();
+
+  var $ = require('jquery');
+  require('jquery.select2');
+
+  var  $fixture = $('#qunit-fixture');
+
+  var $selectOrig = $(
+    '<select>' +
+      '<option>1</option>' +
+      '<option>2</option>' +
+    '</select>'
+  );
+  $fixture.append($selectOrig);
+
+  $(function() {
+    $selectOrig.select2({minimumResultsForSearch: 1});
+    assertSelectyStuffIsNotFocused(assert, $selectOrig, $fixture);
+
+    $selectOrig.select2('open');
+
+    setTimeout(function() {
+      var $search = $('body .select2-container input.select2-search__field');
+      assert.equal($search.length, 1, 'Search input should exist.');
+      var searchElem = $search[0];
+
+      assert.ok(
+        $.contains(document.documentElement, $search[0]),
+        'Search input should be in DOM.');
+      assert.ok($search.is(':visible'), 'Search input should be visible.');
+
+      assert.equal(
+        searchElem.ownerDocument.activeElement,
+        searchElem,
+        'Search input should be focused. Focused element was ' +
+          searchElem.ownerDocument.activeElement);
+
+      done();
+    }, 0);
+  });
+});
+
+test(
+  'open focuses something reasonable when search input is invisible.', 
+  function (assert) {
+  var done = assert.async();
+
+  var $ = require('jquery');
+  require('jquery.select2');
+
+  var  $fixture = $('#qunit-fixture');
+
+  var $selectOrig = $(
+    '<select>' +
+      '<option>1</option>' +
+      '<option>2</option>' +
+    '</select>'
+  );
+  $fixture.append($selectOrig);
+
+  $(function() {
+    $selectOrig.select2({minimumResultsForSearch: 99});
+    assertSelectyStuffIsNotFocused(assert, $selectOrig, $fixture);
+
+    $selectOrig.select2('open');
+
+    setTimeout(function() {
+      var $hidden = $('body select2-search');
+      assert.equal(
+        $hidden.length,
+        0,
+        'A container for search should be removed from the DOM.');
+     
+      var $container = $('body .select2-container');
+      var activeElement = document.activeElement;
+      assert.ok(
+        $.contains($container[0], activeElement),
+        'Something in the dropdown should be focused. Focused element was ' +
+          activeElement);
+
+      done();
+    }, 0);
+  });
+});
+
+function assertSelectyStuffIsNotFocused(assert, $selectOrig, $fixture) {
+    var activeElement = document.activeElement;
+    assert.equal(
+      $selectOrig.has(':focus').length,
+      0,
+      'Original select field should not be focused. Focused element was ' +
+        activeElement);
+    assert.equal(
+      $fixture.find('.select2').has(':focus').length,
+      0,
+      'Select2 elements should not be focused. Focused element was ' +
+        activeElement);
+}
+

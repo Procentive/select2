@@ -3962,10 +3962,12 @@ S2.define('select2/dropdown/search',[
     container.on('open', function () {
       self.$search.attr('tabindex', 0);
 
-      self.$search.focus();
-
       window.setTimeout(function () {
-        self.$search.focus();
+        if(self.$search && self.$search.length && document.documentElement.contains(self.$search[0])) {
+          self.$search.focus();
+        } else {
+          self.$container.find('.select2-selection').focus();
+        }
       }, 0);
     });
 
@@ -3986,7 +3988,6 @@ S2.define('select2/dropdown/search',[
         var showSearch = self.showSearch(params);
 
         if (showSearch) {
-          self.$searchContainer.removeClass('select2-search--hide');
 
           // If search will show, we need to treat $selection like a dropdown
           var selection = self.$container.find('.select2-selection');
@@ -4016,6 +4017,9 @@ S2.define('select2/dropdown/search',[
         } else {
           // Remove search from DOM if it shouldn't show
           self.$searchContainer.remove();
+          if(self.$search.is(':focus')) {
+            self.$container.find('.select2-selection').focus();
+          }
         }
       }
     });
