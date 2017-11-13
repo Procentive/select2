@@ -12,10 +12,14 @@
     cursor: pointer;
     float: right;
     font-weight: bold;
+    background: none;
+    -webkit-appearance: none;
+    border: none;
+    line-height: 1;
   }
 
   .select2-selection__placeholder {
-    color: #999;
+    color: #666;
   }
 
   .select2-selection__arrow {

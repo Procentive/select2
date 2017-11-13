@@ -791,10 +791,10 @@ S2.define('select2/results',[
 
   Results.prototype.render = function () {
     var $results = $(
-      '<ul class="select2-results__options" role="tree"></ul>'
+      '<ul class="select2-results__options" role="listbox"></ul>'
     );
 
-    if (this.options.get('multiple')) {
+    if(this.options.options.multiple) {
       $results.attr('aria-multiselectable', 'true');
     }
 
@@ -814,8 +814,8 @@ S2.define('select2/results',[
     this.hideLoading();
 
     var $message = $(
-      '<li role="treeitem" aria-live="assertive"' +
-      ' class="select2-results__option"></li>'
+      '<li role="option" aria-live="assertive"' +
+      ' class="select2-results__option" tabindex="-1"></li>'
     );
 
     var message = this.options.get('translations').get(params.message);
@@ -948,8 +948,10 @@ S2.define('select2/results',[
     option.className = 'select2-results__option';
 
     var attrs = {
-      'role': 'treeitem',
-      'aria-selected': 'false'
+      'role': 'option',
+      'aria-selected': 'false',
+      'tabindex': '-1',
+      'id': 'select2Opt_' + (data.id || data._resultId)
     };
 
     if (data.disabled) {
@@ -1066,8 +1068,6 @@ S2.define('select2/results',[
     });
 
     container.on('open', function () {
-      // When the dropdown is open, aria-expended="true"
-      self.$results.attr('aria-expanded', 'true');
       self.$results.attr('aria-hidden', 'false');
 
       self.setClasses();
@@ -1075,8 +1075,6 @@ S2.define('select2/results',[
     });
 
     container.on('close', function () {
-      // When the dropdown is closed, aria-expended="false"
-      self.$results.attr('aria-expanded', 'false');
       self.$results.attr('aria-hidden', 'true');
       self.$results.removeAttr('aria-activedescendant');
     });
@@ -1238,6 +1236,15 @@ S2.define('select2/results',[
       self.getHighlightedResults()
           .removeClass('select2-results__option--highlighted');
 
+      // Active descendant goes to search input if it's on the DOM
+      if (self.data && self.data.container && self.data.container.$selection) {
+        if (self.data.container.$dropdown && self.data.container.$dropdown.find('.select2-search__field').length) {
+            self.data.container.$dropdown.find('.select2-search__field').attr('aria-activedescendant', data.id);
+        } else {
+            self.data.container.$selection.attr('aria-activedescendant', data.id);
+        }
+      }
+
       self.trigger('results:focus', {
         data: data,
         element: $(this)
@@ -1341,9 +1348,9 @@ S2.define('select2/selection/base',[
 
   BaseSelection.prototype.render = function () {
     var $selection = $(
-      '<span class="select2-selection" role="combobox" ' +
-      ' aria-haspopup="true" aria-expanded="false">' +
-      '</span>'
+      '<button class="select2-selection" role="combobox" ' +
+      ' aria-haspopup="listbox" aria-expanded="false" aria-autocomplete="list">' +
+      '</button>'
     );
 
     this._tabindex = 0;
@@ -1355,6 +1362,7 @@ S2.define('select2/selection/base',[
     }
 
     $selection.attr('title', this.$element.attr('title'));
+    $selection.attr('aria-label', this.$element.attr('aria-label'));
     $selection.attr('tabindex', this._tabindex);
 
     this.$selection = $selection;
@@ -1387,7 +1395,11 @@ S2.define('select2/selection/base',[
     });
 
     container.on('results:focus', function (params) {
-      self.$selection.attr('aria-activedescendant', params.data._resultId);
+        if (self.container && self.container.$dropdown && self.container.$dropdown.find('.select2-search__field').length) {
+            self.container.$dropdown.attr('aria-activedescendant', params.data._resultId);
+        } else {
+            self.$selection.attr('aria-activedescendant', params.data._resultId);
+        }
     });
 
     container.on('selection:update', function (params) {
@@ -1397,7 +1409,7 @@ S2.define('select2/selection/base',[
     container.on('open', function () {
       // When the dropdown is open, aria-expanded="true"
       self.$selection.attr('aria-expanded', 'true');
-      self.$selection.attr('aria-owns', resultsId);
+      self.$selection.attr('aria-controls', resultsId);
 
       self._attachCloseHandler(container);
     });
@@ -1406,7 +1418,7 @@ S2.define('select2/selection/base',[
       // When the dropdown is closed, aria-expanded="false"
       self.$selection.attr('aria-expanded', 'false');
       self.$selection.removeAttr('aria-activedescendant');
-      self.$selection.removeAttr('aria-owns');
+      self.$selection.removeAttr('aria-controls');
 
       self.$selection.focus();
 
@@ -1613,9 +1625,11 @@ S2.define('select2/selection/multiple',[
     MultipleSelection.__super__.bind.apply(this, arguments);
 
     this.$selection.on('click', function (evt) {
-      self.trigger('toggle', {
-        originalEvent: evt
-      });
+      if (evt && evt.originalEvent && (evt.originalEvent.screenX || evt.originalEvent.screenX)) {
+        self.trigger('toggle', {
+          originalEvent: evt
+        });
+      }
     });
 
     this.$selection.on(
@@ -1816,7 +1830,7 @@ S2.define('select2/selection/allowClear',[
       return;
     }
 
-    if (evt.which == KEYS.DELETE || evt.which == KEYS.BACKSPACE) {
+    if (evt.which == KEYS.DELETE || evt.which == KEYS.BACKSPACE || (evt.which == KEYS.ENTER && $(evt.target).hasClass('.select2-selection__clear'))) {
       this._handleClear(evt);
     }
   };
@@ -1830,9 +1844,9 @@ S2.define('select2/selection/allowClear',[
     }
 
     var $remove = $(
-      '<span class="select2-selection__clear">' +
+      '<button class="select2-selection__clear">' +
         '&times;' +
-      '</span>'
+      '</button>'
     );
     $remove.data('data', data);
 
@@ -3910,7 +3924,7 @@ S2.define('select2/dropdown/search',[
       '<span class="select2-search select2-search--dropdown">' +
         '<input class="select2-search__field" type="search" tabindex="-1"' +
         ' autocomplete="off" autocorrect="off" autocapitalize="none"' +
-        ' spellcheck="false" role="textbox" />' +
+        ' spellcheck="false" role="textbox" aria-autocomplete="list" />' +
       '</span>'
     );
 
@@ -3948,10 +3962,12 @@ S2.define('select2/dropdown/search',[
     container.on('open', function () {
       self.$search.attr('tabindex', 0);
 
-      self.$search.focus();
-
       window.setTimeout(function () {
-        self.$search.focus();
+        if(self.$search && self.$search.length && document.documentElement.contains(self.$search[0])) {
+          self.$search.focus();
+        } else {
+          self.$container.find('.select2-selection').focus();
+        }
       }, 0);
     });
 
@@ -3972,9 +3988,38 @@ S2.define('select2/dropdown/search',[
         var showSearch = self.showSearch(params);
 
         if (showSearch) {
-          self.$searchContainer.removeClass('select2-search--hide');
+
+          // If search will show, we need to treat $selection like a dropdown
+          var selection = self.$container.find('.select2-selection');
+
+          // These attributes will be removed from selection and added to search
+          var attributesToTransfer = [
+            'role',
+            'aria-autocomplete',
+            'aria-haspopup',
+            'aria-activedescendant',
+            'aria-controls'
+          ];
+
+          for (var i = 0; i < attributesToTransfer.length; i++) {
+            var tmpAttr = selection.attr(attributesToTransfer[i]);
+
+            if (attributesToTransfer[i] === 'aria-controls') {
+              var newAriaControls = tmpAttr.split('-results')[0] + '-resultDropdown';
+              self.$searchContainer.find('input').attr('aria-owns', tmpAttr);
+              selection.attr('aria-controls', newAriaControls);
+              self.$dropdown.attr({ role: 'region', 'id': newAriaControls });
+            } else {
+              selection.removeAttr(attributesToTransfer[i]);
+              self.$searchContainer.find('input').attr(attributesToTransfer[i], tmpAttr);
+            }
+          }
         } else {
-          self.$searchContainer.addClass('select2-search--hide');
+          // Remove search from DOM if it shouldn't show
+          self.$searchContainer.remove();
+          if(self.$search.is(':focus')) {
+            self.$container.find('.select2-selection').focus();
+          }
         }
       }
     });
@@ -4119,7 +4164,7 @@ S2.define('select2/dropdown/infiniteScroll',[
     var $option = $(
       '<li ' +
       'class="select2-results__option select2-results__option--load-more"' +
-      'role="treeitem" aria-disabled="true"></li>'
+      'role="option" aria-disabled="true"></li>'
     );
 
     var message = this.options.get('translations').get('loadingMore');
@@ -4255,40 +4300,51 @@ S2.define('select2/dropdown/attachBody',[
   };
 
   AttachBody.prototype._positionDropdown = function () {
-    var $window = $(window);
+    var found = false;
+    var $clippingAncestor = $('.select2-results').parents().filter(function(e) {
+      if(found) {
+        return false;
+      }
+      else {
+        found = $(this).css('overflow-y') != 'visible' &&
+          $(this).css('position') != 'static';
+        return found;
+      }
+    });
+
+    if($clippingAncestor.length == 0)
+      {
+      $clippingAncestor = $('body');
+      }
 
     var isCurrentlyAbove = this.$dropdown.hasClass('select2-dropdown--above');
     var isCurrentlyBelow = this.$dropdown.hasClass('select2-dropdown--below');
 
     var newDirection = null;
 
-    var offset = this.$container.offset();
+    var containerOffset = this.$container.offset();
+    containerOffset.bottom =
+      containerOffset.top + this.$container.outerHeight(false);
 
-    offset.bottom = offset.top + this.$container.outerHeight(false);
-
-    var container = {
+    var containerDimensions = {
       height: this.$container.outerHeight(false)
     };
 
-    container.top = offset.top;
-    container.bottom = offset.top + container.height;
+    containerDimensions.top = containerOffset.top;
+    containerDimensions.bottom =
+      containerOffset.top + containerDimensions.height;
 
     var dropdown = {
       height: this.$dropdown.outerHeight(false)
     };
 
-    var viewport = {
-      top: $window.scrollTop(),
-      bottom: $window.scrollTop() + $window.height()
-    };
+    var clippingOffset = $clippingAncestor.offset();
+    clippingOffset.bottom = clippingOffset.top + $clippingAncestor.height();
 
-    var enoughRoomAbove = viewport.top < (offset.top - dropdown.height);
-    var enoughRoomBelow = viewport.bottom > (offset.bottom + dropdown.height);
-
-    var css = {
-      left: offset.left,
-      top: container.bottom
-    };
+    var enoughRoomAbove = clippingOffset.top <
+      (containerOffset.top - dropdown.height);
+    var enoughRoomBelow = clippingOffset.bottom >
+      (containerOffset.bottom + dropdown.height);
 
     // Determine what the parent element is to use for calciulating the offset
     var $offsetParent = this.$dropdownParent;
@@ -4301,8 +4357,10 @@ S2.define('select2/dropdown/attachBody',[
 
     var parentOffset = $offsetParent.offset();
 
-    css.top -= parentOffset.top;
-    css.left -= parentOffset.left;
+    var css = {
+      left: containerOffset.left - parentOffset.left,
+      top: containerDimensions.bottom - parentOffset.top
+    };
 
     if (!isCurrentlyAbove && !isCurrentlyBelow) {
       newDirection = 'below';
@@ -4316,7 +4374,7 @@ S2.define('select2/dropdown/attachBody',[
 
     if (newDirection == 'above' ||
       (isCurrentlyAbove && newDirection !== 'below')) {
-      css.top = container.top - parentOffset.top - dropdown.height;
+      css.top = containerDimensions.top - parentOffset.top - dropdown.height;
     }
 
     if (newDirection != null) {
@@ -5126,8 +5184,17 @@ S2.define('select2/core',[
     });
 
     // Hide the original select
-    $element.addClass('select2-hidden-accessible');
-    $element.attr('aria-hidden', 'true');
+    $element.addClass('select2-hidden-accessible').attr('aria-hidden', 'true');
+
+    // Find label for vanilla select element and set its for attribute to its id
+    this.$elementId = this.$element.attr('id');
+    this.$element.attr('id', '');
+
+    var $label = $('[for="' + this.$elementId + '"]');
+    if ($label.length) {
+      $label.removeAttr('for').attr('id', this.$elementId);
+      this.hasLabelElement = true;
+    }
 
     // Synchronize any monitored attributes
     this._syncAttributes();
@@ -5332,11 +5399,13 @@ S2.define('select2/core',[
     });
 
     this.on('enable', function () {
-      self.$container.removeClass('select2-container--disabled');
+      self.$container.removeClass('select2-container--disabled')
+        .attr('aria-disabled', 'false');
     });
 
     this.on('disable', function () {
-      self.$container.addClass('select2-container--disabled');
+      self.$container.addClass('select2-container--disabled')
+        .attr('aria-disabled', 'true');
     });
 
     this.on('blur', function () {
@@ -5385,10 +5454,14 @@ S2.define('select2/core',[
         } else if (key === KEYS.UP) {
           self.trigger('results:previous', {});
 
+          // Prevent window from scrolling up
+          evt.stopPropagation();
           evt.preventDefault();
         } else if (key === KEYS.DOWN) {
           self.trigger('results:next', {});
 
+          // Prevent window from scrolling down
+          evt.stopPropagation();
           evt.preventDefault();
         }
       } else {
@@ -5554,7 +5627,7 @@ S2.define('select2/core',[
 
     var disabled = !args[0];
 
-    this.$element.prop('disabled', disabled);
+    this.$element.prop('disabled', disabled).attr('aria-disabled', 'true');
   };
 
   Select2.prototype.data = function () {
@@ -5647,6 +5720,12 @@ S2.define('select2/core',[
     );
 
     $container.attr('dir', this.options.get('dir'));
+
+    if (this.$elementId && this.hasLabelElement) {
+      $container.attr('aria-labelledby', this.$elementId);
+    } else {
+      $container.attr('aria-label', this.$elementId);
+    }
 
     this.$container = $container;
 

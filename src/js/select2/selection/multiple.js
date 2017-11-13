@@ -27,9 +27,11 @@ define([
     MultipleSelection.__super__.bind.apply(this, arguments);
 
     this.$selection.on('click', function (evt) {
-      self.trigger('toggle', {
-        originalEvent: evt
-      });
+      if (evt && evt.originalEvent && (evt.originalEvent.screenX || evt.originalEvent.screenX)) {
+        self.trigger('toggle', {
+          originalEvent: evt
+        });
+      }
     });
 
     this.$selection.on(

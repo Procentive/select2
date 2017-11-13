@@ -177,10 +177,10 @@ test('open focuses search input', function (assert) {
       assert.ok($search.is(':visible'), 'Search input should be visible.');
 
       assert.equal(
-        searchElem,
         searchElem.ownerDocument.activeElement,
+        searchElem,
         'Search input should be focused. Focused element was ' +
-          document.activeElement);
+          searchElem.ownerDocument.activeElement);
 
       done();
     }, 0);
@@ -212,23 +212,13 @@ test(
     $selectOrig.select2('open');
 
     setTimeout(function() {
-      var $hidden = $('body .select2-search--dropdown.select2-search--hide');
+      var $hidden = $('body select2-search');
       assert.equal(
         $hidden.length,
-        1,
-        'A container for search should be hidden.');
-      assert.ok($hidden.is(':hidden'), 'Hidden section should be hidden.');
-      assert.equal(
-        $hidden.css('display'),
-        'none',
-        'Hidden section should have display:none.');
-
+        0,
+        'A container for search should be removed from the DOM.');
+     
       var $container = $('body .select2-container');
-      var $search = $container.find('input.select2-search__field');
-      assert.ok(
-        $search.is(':hidden'),
-        'Select2 dropdown should not have a visible search field.');
-
       var activeElement = document.activeElement;
       assert.ok(
         $.contains($container[0], activeElement),

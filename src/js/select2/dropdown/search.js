@@ -11,7 +11,7 @@ define([
       '<span class="select2-search select2-search--dropdown">' +
         '<input class="select2-search__field" type="search" tabindex="-1"' +
         ' autocomplete="off" autocorrect="off" autocapitalize="none"' +
-        ' spellcheck="false" role="textbox" />' +
+        ' spellcheck="false" role="textbox" aria-autocomplete="list" />' +
       '</span>'
     );
 
@@ -50,10 +50,10 @@ define([
       self.$search.attr('tabindex', 0);
 
       window.setTimeout(function () {
-        if(self.$searchContainer.hasClass('select2-search--hide')) {
-          self.$container.find('.select2-selection').focus();
-        } else {
+        if(self.$search && self.$search.length && document.documentElement.contains(self.$search[0])) {
           self.$search.focus();
+        } else {
+          self.$container.find('.select2-selection').focus();
         }
       }, 0);
     });
@@ -75,12 +75,38 @@ define([
         var showSearch = self.showSearch(params);
 
         if (showSearch) {
-          self.$searchContainer.removeClass('select2-search--hide');
+
+          // If search will show, we need to treat $selection like a dropdown
+          var selection = self.$container.find('.select2-selection');
+
+          // These attributes will be removed from selection and added to search
+          var attributesToTransfer = [
+            'role',
+            'aria-autocomplete',
+            'aria-haspopup',
+            'aria-activedescendant',
+            'aria-controls'
+          ];
+
+          for (var i = 0; i < attributesToTransfer.length; i++) {
+            var tmpAttr = selection.attr(attributesToTransfer[i]);
+
+            if (attributesToTransfer[i] === 'aria-controls') {
+              var newAriaControls = tmpAttr.split('-results')[0] + '-resultDropdown';
+              self.$searchContainer.find('input').attr('aria-owns', tmpAttr);
+              selection.attr('aria-controls', newAriaControls);
+              self.$dropdown.attr({ role: 'region', 'id': newAriaControls });
+            } else {
+              selection.removeAttr(attributesToTransfer[i]);
+              self.$searchContainer.find('input').attr(attributesToTransfer[i], tmpAttr);
+            }
+          }
         } else {
+          // Remove search from DOM if it shouldn't show
+          self.$searchContainer.remove();
           if(self.$search.is(':focus')) {
             self.$container.find('.select2-selection').focus();
           }
-          self.$searchContainer.addClass('select2-search--hide');
         }
       }
     });

@@ -70,7 +70,7 @@ define([
       return;
     }
 
-    if (evt.which == KEYS.DELETE || evt.which == KEYS.BACKSPACE) {
+    if (evt.which == KEYS.DELETE || evt.which == KEYS.BACKSPACE || (evt.which == KEYS.ENTER && $(evt.target).hasClass('.select2-selection__clear'))) {
       this._handleClear(evt);
     }
   };
@@ -84,9 +84,9 @@ define([
     }
 
     var $remove = $(
-      '<span class="select2-selection__clear">' +
+      '<button class="select2-selection__clear">' +
         '&times;' +
-      '</span>'
+      '</button>'
     );
     $remove.data('data', data);
 

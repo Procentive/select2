@@ -77,8 +77,17 @@ define([
     });
 
     // Hide the original select
-    $element.addClass('select2-hidden-accessible');
-    $element.attr('aria-hidden', 'true');
+    $element.addClass('select2-hidden-accessible').attr('aria-hidden', 'true');
+
+    // Find label for vanilla select element and set its for attribute to its id
+    this.$elementId = this.$element.attr('id');
+    this.$element.attr('id', '');
+
+    var $label = $('[for="' + this.$elementId + '"]');
+    if ($label.length) {
+      $label.removeAttr('for').attr('id', this.$elementId);
+      this.hasLabelElement = true;
+    }
 
     // Synchronize any monitored attributes
     this._syncAttributes();
@@ -283,11 +292,13 @@ define([
     });
 
     this.on('enable', function () {
-      self.$container.removeClass('select2-container--disabled');
+      self.$container.removeClass('select2-container--disabled')
+        .attr('aria-disabled', 'false');
     });
 
     this.on('disable', function () {
-      self.$container.addClass('select2-container--disabled');
+      self.$container.addClass('select2-container--disabled')
+        .attr('aria-disabled', 'true');
     });
 
     this.on('blur', function () {
@@ -336,10 +347,14 @@ define([
         } else if (key === KEYS.UP) {
           self.trigger('results:previous', {});
 
+          // Prevent window from scrolling up
+          evt.stopPropagation();
           evt.preventDefault();
         } else if (key === KEYS.DOWN) {
           self.trigger('results:next', {});
 
+          // Prevent window from scrolling down
+          evt.stopPropagation();
           evt.preventDefault();
         }
       } else {
@@ -505,7 +520,7 @@ define([
 
     var disabled = !args[0];
 
-    this.$element.prop('disabled', disabled);
+    this.$element.prop('disabled', disabled).attr('aria-disabled', 'true');
   };
 
   Select2.prototype.data = function () {
@@ -598,6 +613,12 @@ define([
     );
 
     $container.attr('dir', this.options.get('dir'));
+
+    if (this.$elementId && this.hasLabelElement) {
+      $container.attr('aria-labelledby', this.$elementId);
+    } else {
+      $container.attr('aria-label', this.$elementId);
+    }
 
     this.$container = $container;
 

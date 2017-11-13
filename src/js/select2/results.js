@@ -14,10 +14,10 @@ define([
 
   Results.prototype.render = function () {
     var $results = $(
-      '<ul class="select2-results__options" role="tree"></ul>'
+      '<ul class="select2-results__options" role="listbox"></ul>'
     );
 
-    if (this.options.get('multiple')) {
+    if(this.options.options.multiple) {
       $results.attr('aria-multiselectable', 'true');
     }
 
@@ -37,8 +37,8 @@ define([
     this.hideLoading();
 
     var $message = $(
-      '<li role="treeitem" aria-live="assertive"' +
-      ' class="select2-results__option"></li>'
+      '<li role="option" aria-live="assertive"' +
+      ' class="select2-results__option" tabindex="-1"></li>'
     );
 
     var message = this.options.get('translations').get(params.message);
@@ -171,8 +171,10 @@ define([
     option.className = 'select2-results__option';
 
     var attrs = {
-      'role': 'treeitem',
-      'aria-selected': 'false'
+      'role': 'option',
+      'aria-selected': 'false',
+      'tabindex': '-1',
+      'id': 'select2Opt_' + (data.id || data._resultId)
     };
 
     if (data.disabled) {
@@ -289,8 +291,6 @@ define([
     });
 
     container.on('open', function () {
-      // When the dropdown is open, aria-expended="true"
-      self.$results.attr('aria-expanded', 'true');
       self.$results.attr('aria-hidden', 'false');
 
       self.setClasses();
@@ -298,8 +298,6 @@ define([
     });
 
     container.on('close', function () {
-      // When the dropdown is closed, aria-expended="false"
-      self.$results.attr('aria-expanded', 'false');
       self.$results.attr('aria-hidden', 'true');
       self.$results.removeAttr('aria-activedescendant');
     });
@@ -460,6 +458,15 @@ define([
 
       self.getHighlightedResults()
           .removeClass('select2-results__option--highlighted');
+
+      // Active descendant goes to search input if it's on the DOM
+      if (self.data && self.data.container && self.data.container.$selection) {
+        if (self.data.container.$dropdown && self.data.container.$dropdown.find('.select2-search__field').length) {
+            self.data.container.$dropdown.find('.select2-search__field').attr('aria-activedescendant', data.id);
+        } else {
+            self.data.container.$selection.attr('aria-activedescendant', data.id);
+        }
+      }
 
       self.trigger('results:focus', {
         data: data,

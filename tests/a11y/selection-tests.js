@@ -61,7 +61,7 @@ test('static aria attributes are present', function (assert) {
 
   assert.equal(
     $selection.attr('aria-haspopup'),
-    'true',
+    'listbox',
     'The dropdown is considered a popup of the container'
   );
 });
