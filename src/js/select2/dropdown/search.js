@@ -102,11 +102,10 @@ define([
             }
           }
         } else {
-          // Remove search from DOM if it shouldn't show
-          self.$searchContainer.remove();
           if(self.$search.is(':focus')) {
             self.$container.find('.select2-selection').focus();
           }
+          self.$searchContainer.remove();
         }
       }
     });
