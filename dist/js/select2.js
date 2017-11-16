@@ -1348,9 +1348,9 @@ S2.define('select2/selection/base',[
 
   BaseSelection.prototype.render = function () {
     var $selection = $(
-      '<button class="select2-selection" role="combobox" ' +
+      '<span class="select2-selection" role="combobox" ' +
       ' aria-haspopup="listbox" aria-expanded="false" aria-autocomplete="list">' +
-      '</button>'
+      '</span>'
     );
 
     this._tabindex = 0;
@@ -1625,11 +1625,9 @@ S2.define('select2/selection/multiple',[
     MultipleSelection.__super__.bind.apply(this, arguments);
 
     this.$selection.on('click', function (evt) {
-      if (evt && evt.originalEvent && (evt.originalEvent.screenX || evt.originalEvent.screenX)) {
-        self.trigger('toggle', {
-          originalEvent: evt
-        });
-      }
+      self.trigger('toggle', {
+        originalEvent: evt
+      });
     });
 
     this.$selection.on(

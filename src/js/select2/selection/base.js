@@ -14,9 +14,9 @@ define([
 
   BaseSelection.prototype.render = function () {
     var $selection = $(
-      '<button class="select2-selection" role="combobox" ' +
+      '<span class="select2-selection" role="combobox" ' +
       ' aria-haspopup="listbox" aria-expanded="false" aria-autocomplete="list">' +
-      '</button>'
+      '</span>'
     );
 
     this._tabindex = 0;
