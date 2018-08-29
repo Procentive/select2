@@ -4727,7 +4727,8 @@ S2.define('select2/defaults',[
     }
 
     if (options.dropdownAdapter == null) {
-      if (options.multiple) {
+      // New option: searchInDropdown (forces search to appear in dropdown instead of inline)
+      if (options.multiple && !options.searchInDropdown) {
         options.dropdownAdapter = Dropdown;
       } else {
         var SearchableDropdown = Utils.Decorate(Dropdown, DropdownSearch);
@@ -4790,7 +4791,8 @@ S2.define('select2/defaults',[
         );
       }
 
-      if (options.multiple) {
+      // New option: searchInDropdown (forces search to appear in dropdown instead of inline)
+      if (options.multiple && !options.searchInDropdown) {
         options.selectionAdapter = Utils.Decorate(
           options.selectionAdapter,
           SelectionSearch
