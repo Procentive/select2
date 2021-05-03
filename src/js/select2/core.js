@@ -594,7 +594,9 @@ define([
     this.$element.removeData('select2');
     // replace the id that was removed in initialization
     if(this.$elementId)
+      {
       this.$element.attr('id', this.$elementId);
+      }
 
     this.dataAdapter.destroy();
     this.selection.destroy();
