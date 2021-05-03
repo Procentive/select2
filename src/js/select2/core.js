@@ -100,9 +100,9 @@ define([
   Select2.prototype._generateId = function ($element) {
     var id = '';
 
-    if ($element.attr('id') != null) {
+    if ($element.attr('id') != null && $element.attr('id').length > 0) {
       id = $element.attr('id');
-    } else if ($element.attr('name') != null) {
+    } else if ($element.attr('name') != null && $element.attr('name').length > 0) {
       id = $element.attr('name') + '-' + Utils.generateChars(2);
     } else {
       id = Utils.generateChars(4);
