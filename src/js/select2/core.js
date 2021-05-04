@@ -100,9 +100,9 @@ define([
   Select2.prototype._generateId = function ($element) {
     var id = '';
 
-    if ($element.attr('id') != null) {
+    if ($element.attr('id')) {
       id = $element.attr('id');
-    } else if ($element.attr('name') != null) {
+    } else if ($element.attr('name')) {
       id = $element.attr('name') + '-' + Utils.generateChars(2);
     } else {
       id = Utils.generateChars(4);
@@ -592,6 +592,11 @@ define([
     this.$element.removeClass('select2-hidden-accessible');
     this.$element.attr('aria-hidden', 'false');
     this.$element.removeData('select2');
+    // replace the id that was removed in initialization
+    if(this.$elementId)
+      {
+      this.$element.attr('id', this.$elementId);
+      }
 
     this.dataAdapter.destroy();
     this.selection.destroy();
