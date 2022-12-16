@@ -91,12 +91,12 @@ define([
           for (var i = 0; i < attributesToTransfer.length; i++) {
             var tmpAttr = selection.attr(attributesToTransfer[i]);
 
-            if (attributesToTransfer[i] === 'aria-controls') {
+            if (attributesToTransfer[i] === 'aria-controls' && tmpAttr != null) {
               var newAriaControls = tmpAttr.split('-results')[0] + '-resultDropdown';
               self.$searchContainer.find('input').attr('aria-owns', tmpAttr);
               selection.attr('aria-controls', newAriaControls);
               self.$dropdown.attr({ role: 'region', 'id': newAriaControls });
-            } else {
+            } else if(tmpAttr != null) {
               selection.removeAttr(attributesToTransfer[i]);
               self.$searchContainer.find('input').attr(attributesToTransfer[i], tmpAttr);
             }
