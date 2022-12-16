@@ -5210,7 +5210,7 @@ S2.define('select2/core',[
 
     if ($element.attr('id')) {
       id = $element.attr('id');
-    } else if ($element.attr('name') != null) {
+    } else if ($element.attr('name')) {
       id = $element.attr('name') + '-' + Utils.generateChars(2);
     } else {
       id = Utils.generateChars(4);
