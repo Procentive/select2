@@ -5700,6 +5700,11 @@ S2.define('select2/core',[
     this.$element.removeClass('select2-hidden-accessible');
     this.$element.attr('aria-hidden', 'false');
     this.$element.removeData('select2');
+    // replace the id that was removed in initialization
+    if(this.$elementId)
+      {
+      this.$element.attr('id', this.$elementId);
+      }
 
     this.dataAdapter.destroy();
     this.selection.destroy();
