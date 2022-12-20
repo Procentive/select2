@@ -90,6 +90,8 @@ define([
 
           for (var i = 0; i < attributesToTransfer.length; i++) {
             var tmpAttr = selection.attr(attributesToTransfer[i]);
+            if(!tmpAttr)
+              continue;
 
             if (attributesToTransfer[i] === 'aria-controls') {
               var newAriaControls = tmpAttr.split('-results')[0] + '-resultDropdown';
